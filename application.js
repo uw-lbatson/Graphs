@@ -42,10 +42,12 @@ function draw() {
         if (v.selected) {
             context.textAlign = 'left';
             context.textBaseline = 'top';
-            context.font = '40px arial';
+            context.font = '30px arial';
             context.fillStyle = 'black'
-            context.fillText(graph.getNeighbours(v).sort(
-                                (a,b) => a-b), 10, 10);
+
+            let nbrs = graph.getNeighbours(v).sort((a,b) => a-b);
+            context.fillText(`deg(v${v.number}) = ${nbrs.length}`, 10, 10);
+            context.fillText(`Neighbours: ${nbrs}`, 10, 40);
         }
     }
 }
