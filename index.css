@@ -3,7 +3,7 @@
     --bg: #fafafa
 }
 
-html, body, nav, ul, h1, h2, h3, h4, a, canvas {
+html, body, nav, ul, h1, h2, h3, h4, a {
     margin: 0px; 
     padding: 0px;
     color: var(--text-color);
@@ -24,3 +24,16 @@ html, body {
     -moz-osx-font-smoothing: grayscale;
     outline: 0;
 }
+
+/*canvas {
+    padding: 0;
+    margin: auto;
+    display: block;
+    width: 60%;
+    height: 80%;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }*/

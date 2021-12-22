@@ -1,7 +1,7 @@
 import * as graph from './graphFunctions.js';
 
 const canvas = document.getElementById('appCanvas');
-canvas.style.display= 'block';
+canvas.style.display = 'block';
 const context = canvas.getContext('2d');
 const ONEKEY = 49;
 const TWOKEY = 50;
@@ -24,7 +24,7 @@ function draw() {
 
     // draw every vertex
     for (let i = 0; i < graph.vertices.length; i++) {
-        let v= graph.vertices[i];
+        let v = graph.vertices[i];
 
         context.beginPath();
         context.fillStyle = v.selected ? v.selectedFill : v.fillStyle;
@@ -35,9 +35,18 @@ function draw() {
 
         context.textAlign = 'center';
         context.textBaseline = 'middle';
-        context.font = '16px arial';
+        context.font = '24px arial';
         context.fillStyle = 'black'
         context.fillText(v.number, v.x, v.y);
+
+        if (v.selected) {
+            context.textAlign = 'left';
+            context.textBaseline = 'top';
+            context.font = '40px arial';
+            context.fillStyle = 'black'
+            context.fillText(graph.getNeighbours(v).sort(
+                                (a,b) => a-b), 10, 10);
+        }
     }
 }
 
@@ -76,7 +85,7 @@ function down(e) {
     if (target) {
         if (selection && selection !== target) {
             if (!graph.isEdge(selection, target)) {
-                graph.addEdge({ from: selection, to: target });
+                graph.addEdge(selection, target);
             }
         }
         selection = target;
@@ -87,17 +96,7 @@ function down(e) {
 
 function up(e) {
     if (!selection) {
-        let vertex = {
-            number: graph.vertices.length + 1,
-            x: e.x,
-            y: e.y,
-            radius: 12.5,
-            fillStyle: '#8c92ff',
-            strokeStyle: '#000000',
-            selectedFill: '#ff2b59',
-            selected: false
-        };
-        graph.addVertex(vertex);
+        graph.addVertex(e.x, e.y);
         draw();
     }
 
