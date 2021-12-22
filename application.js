@@ -1,19 +1,20 @@
-const canvas = document.querySelector('canvas');
+import * as graph from './graphFunctions.js';
+
+const canvas = document.getElementById('appCanvas');
+canvas.style.display= 'block';
 const context = canvas.getContext('2d');
-
-
-let vertices = [];
-let edges = [];
+const ONEKEY = 49;
+const TWOKEY = 50;
+const THREEKEY = 51;
 let selection = undefined;
-
 
 function draw() {
     context.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
     // draw every edge
-    for (let i = 0; i < edges.length; i++) {
-        let fromVertex = edges[i].from;
-        let toVertex = edges[i].to;
+    for (let i = 0; i < graph.edges.length; i++) {
+        let fromVertex = graph.edges[i].from;
+        let toVertex = graph.edges[i].to;
         context.beginPath();
         context.strokeStyle = fromVertex.strokeStyle;
         context.moveTo(fromVertex.x, fromVertex.y);
@@ -22,24 +23,29 @@ function draw() {
     }
 
     // draw every vertex
-    for (let i = 0; i < vertices.length; i++) {
-        let vertex = vertices[i];
+    for (let i = 0; i < graph.vertices.length; i++) {
+        let v= graph.vertices[i];
 
         context.beginPath();
-        context.fillStyle = vertex.selected ? vertex.selectedFill : vertex.fillStyle;
-        context.arc(vertex.x, vertex.y, vertex.radius, 0, Math.PI * 2, true);
-        context.strokeStyle = vertex.strokeStyle;
+        context.fillStyle = v.selected ? v.selectedFill : v.fillStyle;
+        context.arc(v.x, v.y, v.radius, 0, Math.PI * 2, true);
+        context.strokeStyle = v.strokeStyle;
         context.fill();
         context.stroke();
-    }
 
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+        context.font = '16px arial';
+        context.fillStyle = 'black'
+        context.fillText(v.number, v.x, v.y);
+    }
 }
 
 /**
  * finds first vertex around (x, y)
  */
 function within(x, y) {
-    return vertices.find(v => {
+    return graph.vertices.find(v => {
         return x > (v.x - v.radius) &&
             y > (v.y - v.radius) &&
             x < (v.x + v.radius) &&
@@ -50,7 +56,7 @@ function within(x, y) {
 
 
 
-/* Mouse functions */
+/* Key and mouse functions */
 
 function move(e) {
     if (selection && e.buttons) {
@@ -69,7 +75,9 @@ function down(e) {
 
     if (target) {
         if (selection && selection !== target) {
-            edges.push({ from: selection, to: target });
+            if (!graph.isEdge(selection, target)) {
+                graph.addEdge({ from: selection, to: target });
+            }
         }
         selection = target;
         selection.selected = true;
@@ -80,16 +88,16 @@ function down(e) {
 function up(e) {
     if (!selection) {
         let vertex = {
-            number: vertices.length + 1,
+            number: graph.vertices.length + 1,
             x: e.x,
             y: e.y,
-            radius: 10,
+            radius: 12.5,
             fillStyle: '#8c92ff',
             strokeStyle: '#000000',
             selectedFill: '#ff2b59',
             selected: false
         };
-        vertices.push(vertex);
+        graph.addVertex(vertex);
         draw();
     }
 
@@ -100,9 +108,27 @@ function up(e) {
     draw();
 }
 
+function keys(e) {
+    if (e.keyCode === ONEKEY) {
+        graph.removeVertex();
+    }
+
+    if (e.keyCode === TWOKEY) {
+        graph.removeEdge();
+    }
+
+    if (e.keyCode === THREEKEY) {
+        graph.clear()
+    }
+
+    selection = undefined;
+    draw();
+}
+
 window.onmousemove = move;
 window.onmouseup = up;
 window.onmousedown = down;
+window.onkeypress = keys;
 
 
 
