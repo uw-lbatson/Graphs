@@ -103,6 +103,16 @@ function getVerticesForPath() {
                         10, 70);
 }
 
+function checkConnectivity() {
+    let result = graph.isConnected();
+    context.textAlign = 'left';
+    context.textBaseline = 'top';
+    context.font = '30px arial';
+    context.fillStyle = 'black'
+    context.fillText(`Is connected?: ${result}`,
+                        10, 70);
+}
+
 
 
 /* Key and mouse functions */
@@ -180,7 +190,11 @@ window.onkeydown = keys;
 
 document.getElementById("pathBtn").onclick = function() {
     getVerticesForPath();
-};  
+};
+
+document.getElementById("connectedBtn").onclick = function() {
+    checkConnectivity();
+};
 
 
 

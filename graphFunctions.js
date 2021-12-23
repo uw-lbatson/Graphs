@@ -96,6 +96,10 @@ export function findPath(v1, v2, visited, queue) {
     visited[v1.number - 1] = true;
     queue[queue.length] = v1;
 
+    if (v1 == v2) {
+        return queue;
+    }
+
     let vertexNbrs = getNeighbours(v1);
     if (vertexNbrs.includes(v2)) {
         queue[queue.length] = v2;
@@ -140,6 +144,23 @@ export function deselectAll() {
         let edge = edges[i];
         edge.highlight = false;
     }
+}
+
+export function isConnected() {
+    if (vertices.length == 0) {
+        return "Graph has no vertices";
+    }
+
+    let startingVertex = vertices[0];
+    for (let i = 0; i < vertices.length; i++) {
+        if (findPath(startingVertex, vertices[i], [], [])) {
+            continue;
+        } else {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 
