@@ -22,7 +22,7 @@ export function vertexOnEdge(vertex, edge) {
 }
 
 export function addEdge(v1, v2) {
-    let edge = { from: v1, to: v2 }
+    let edge = { from: v1, to: v2, highlight: false }
     edges.push(edge);
 }
 
@@ -54,6 +54,7 @@ export function removeEdge() {
 export function clear() {
     vertices = [];
     edges = [];
+    deselectAll();
 }
 
 export function printEdges() {
@@ -63,7 +64,18 @@ export function printEdges() {
     }
 }
 
-export function getNeighbours(vertex) {
+export function isVertex(vertexNumber) {
+    for (let i = 0; i < vertices.length; i++) {
+        let v = vertices[i];
+        if (v.number == vertexNumber) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+export function getNbrNumbers(vertex) {
     let neighbours = [];
     for (let i = 0; i < edges.length; i++) {
         let edge = edges[i];
@@ -80,9 +92,86 @@ export function getNeighbours(vertex) {
     return neighbours;
 }
 
-function deselectAll() {
+export function findPath(v1, v2, visited, queue) {
+    visited[v1.number - 1] = true;
+    queue[queue.length] = v1;
+
+    let vertexNbrs = getNeighbours(v1);
+    if (vertexNbrs.includes(v2)) {
+        queue[queue.length] = v2;
+        return queue;
+    }
+
+    for (let i = 0; i < vertexNbrs.length; i++) {
+        if (!visited[vertexNbrs[i].number - 1]) {
+            if (findPath(vertexNbrs[i], v2, visited, queue)) {
+                return queue;
+            }
+        }
+    }
+
+    return false;
+}
+
+export function getPathNumbers(path) {
+    if (path) {
+        let pathNumbers = [];
+        for (let i = 0; i < path.length; i++) {
+            pathNumbers.push(path[i].number);
+        }
+        return pathNumbers;
+    }
+    return false;
+}
+
+export function highlightEdges(path) {
+    for (let i = 0; i < path.length - 1; i++) {
+        highlightEdge(path[i], path[i+1]);
+    }
+}
+
+export function deselectAll() {
     for (let i = 0; i < vertices.length; i++) {
         let vertex = vertices[i];
         vertex.selected = false;
+    }
+
+    for (let i = 0; i < edges.length; i++) {
+        let edge = edges[i];
+        edge.highlight = false;
+    }
+}
+
+
+
+
+
+
+function getNeighbours(vertex) {
+    let neighbours = [];
+    for (let i = 0; i < edges.length; i++) {
+        let edge = edges[i];
+
+        if (edge.from == vertex) {
+            neighbours.push(edge.to);
+        }
+
+        if (edge.to == vertex) {
+            neighbours.push(edge.from);
+        }
+    }
+
+    return neighbours;
+}
+
+function highlightEdge(v1, v2) {
+    if (isVertex(v1.number) && isVertex(v2.number)) {
+        for (let i = 0; i < edges.length; i++) {
+            let edge = edges[i];
+            if ((v1 == edge.to && v2 == edge.from) ||
+                (v1 == edge.from && v2 == edge.to)) {
+                edge.highlight = true;
+            }
+        }
     }
 }

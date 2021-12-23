@@ -3,20 +3,24 @@ import * as graph from './graphFunctions.js';
 const canvas = document.getElementById('appCanvas');
 canvas.style.display = 'block';
 const context = canvas.getContext('2d');
-const ONEKEY = 49;
-const TWOKEY = 50;
-const THREEKEY = 51;
+const VKEY = 86;
+const EKEY = 69;
+const CKEY = 67;
 let selection = undefined;
 
 function draw() {
     context.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
+    //graph.deselectAll();
+
     // draw every edge
     for (let i = 0; i < graph.edges.length; i++) {
+        let edge = graph.edges[i];
         let fromVertex = graph.edges[i].from;
         let toVertex = graph.edges[i].to;
         context.beginPath();
-        context.strokeStyle = fromVertex.strokeStyle;
+        context.lineWidth = 3;
+        context.strokeStyle = edge.highlight ? '#ff0000' : '#000000';
         context.moveTo(fromVertex.x, fromVertex.y);
         context.lineTo(toVertex.x, toVertex.y);
         context.stroke();
@@ -27,6 +31,7 @@ function draw() {
         let v = graph.vertices[i];
 
         context.beginPath();
+        context.lineWidth = 1;
         context.fillStyle = v.selected ? v.selectedFill : v.fillStyle;
         context.arc(v.x, v.y, v.radius, 0, Math.PI * 2, true);
         context.strokeStyle = v.strokeStyle;
@@ -45,7 +50,7 @@ function draw() {
             context.font = '30px arial';
             context.fillStyle = 'black'
 
-            let nbrs = graph.getNeighbours(v).sort((a,b) => a-b);
+            let nbrs = graph.getNbrNumbers(v).sort((a,b) => a-b);
             context.fillText(`deg(v${v.number}) = ${nbrs.length}`, 10, 10);
             context.fillText(`Neighbours: ${nbrs}`, 10, 40);
         }
@@ -64,6 +69,39 @@ function within(x, y) {
     });
 }
 
+function getVerticesForPath() {
+    let vertexStr = document.getElementById('pathFinder').value;
+    let pathedVertices = vertexStr.split(' ');
+
+    if (pathedVertices.length > 2 || pathedVertices.length < 2) {
+        alert("Can only path between two vertices.");
+        return;
+    }
+
+    if (pathedVertices.some(isNaN)) {
+        alert("Vertices must be numeric.");
+        return;
+    }
+
+    if (!graph.isVertex(pathedVertices[0]) || 
+        !graph.isVertex(pathedVertices[1])) {
+        alert("Can only path between existing vertices.");
+        return;
+    }
+
+    let vertexPath = graph.findPath(graph.vertices[pathedVertices[0]-1],
+                    graph.vertices[pathedVertices[1]-1], [], []);
+    let numberPath = graph.getPathNumbers(vertexPath);
+    graph.highlightEdges(vertexPath);
+    
+    draw();
+    context.textAlign = 'left';
+    context.textBaseline = 'top';
+    context.font = '30px arial';
+    context.fillStyle = 'black'
+    context.fillText(`Exists ${pathedVertices[0]},${pathedVertices[1]} path?: ${numberPath}`,
+                        10, 70);
+}
 
 
 
@@ -78,47 +116,52 @@ function move(e) {
 }
 
 function down(e) {
-    let target = within(e.x, e.y);
+    if(e.target.id === 'appCanvas') {
+        graph.deselectAll();
+        let target = within(e.x, e.y);
 
-    if (selection && selection.selected) {
-        selection.selected = false;
-    }
-
-    if (target) {
-        if (selection && selection !== target) {
-            if (!graph.isEdge(selection, target)) {
-                graph.addEdge(selection, target);
-            }
+        if (selection && selection.selected) {
+            selection.selected = false;
         }
-        selection = target;
-        selection.selected = true;
-        draw();
+
+        if (target) {
+            if (selection && selection !== target) {
+                if (!graph.isEdge(selection, target)) {
+                    graph.addEdge(selection, target);
+                }
+            }
+            selection = target;
+            selection.selected = true;
+            draw();
+        }
     }
 }
 
 function up(e) {
-    if (!selection) {
-        graph.addVertex(e.x, e.y);
+    if(e.target.id === 'appCanvas') {
+        if (!selection) {
+            graph.addVertex(e.x, e.y);
+            draw();
+        }
+
+        if (selection && !selection.selected) {
+            selection = undefined;
+        }
+
         draw();
     }
-
-    if (selection && !selection.selected) {
-        selection = undefined;
-    }
-
-    draw();
 }
 
 function keys(e) {
-    if (e.keyCode === ONEKEY) {
+    if (e.keyCode === VKEY) {
         graph.removeVertex();
     }
 
-    if (e.keyCode === TWOKEY) {
+    if (e.keyCode === EKEY) {
         graph.removeEdge();
     }
 
-    if (e.keyCode === THREEKEY) {
+    if (e.keyCode === CKEY) {
         graph.clear()
     }
 
@@ -126,10 +169,18 @@ function keys(e) {
     draw();
 }
 
+
 window.onmousemove = move;
 window.onmouseup = up;
 window.onmousedown = down;
-window.onkeypress = keys;
+window.onkeydown = keys;
+
+
+
+
+document.getElementById("pathBtn").onclick = function() {
+    getVerticesForPath();
+};  
 
 
 
