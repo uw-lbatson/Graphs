@@ -92,7 +92,7 @@ export function getNbrNumbers(vertex) {
     return neighbours;
 }
 
-export function findPath(v1, v2, visited, queue) {
+export function pathExists(v1, v2, visited, queue) {
     visited[v1.number - 1] = true;
     queue[queue.length] = v1;
 
@@ -117,6 +117,25 @@ export function findPath(v1, v2, visited, queue) {
     return false;
 }
 
+export function getPath(v1, v2, allPaths) {
+    let visited = [];
+    let pathList = [];
+    visited[v1.number - 1] = false;
+    pathList.push(v1.number);
+    getAllPaths(v1, v2, visited, pathList, v1, allPaths);
+
+    let parsedPaths = parsePaths(allPaths);
+    console.log(parsedPaths);
+    let shortestPath = getShortestPath(parsedPaths);
+
+    for (let i = 0; i < shortestPath.length; i++) {
+        allPaths[i] = shortestPath[i];
+    }
+    allPaths.length = shortestPath.length;
+
+    return parsedPaths.length;
+}
+
 export function getPathNumbers(path) {
     if (path) {
         let pathNumbers = [];
@@ -130,7 +149,7 @@ export function getPathNumbers(path) {
 
 export function highlightEdges(path) {
     for (let i = 0; i < path.length - 1; i++) {
-        highlightEdge(path[i], path[i+1]);
+        highlightEdge(path[i], path[i + 1]);
     }
 }
 
@@ -153,7 +172,7 @@ export function isConnected() {
 
     let startingVertex = vertices[0];
     for (let i = 0; i < vertices.length; i++) {
-        if (findPath(startingVertex, vertices[i], [], [])) {
+        if (pathExists(startingVertex, vertices[i], [], [])) {
             continue;
         } else {
             return false;
@@ -161,6 +180,18 @@ export function isConnected() {
     }
 
     return true;
+}
+
+export function getVertexPath(numberPath) {
+    let vertexPath = [];
+    for (let i = 0; i < numberPath.length; i++) {
+        for (let j = 0; j < vertices.length; j++) {
+            if (vertices[j].number == numberPath[i]) {
+                vertexPath.push(vertices[j])
+            }
+        }
+    }
+    return vertexPath;
 }
 
 
@@ -182,6 +213,7 @@ function getNeighbours(vertex) {
         }
     }
 
+    neighbours.sort((a, b) => a.number - b.number);
     return neighbours;
 }
 
@@ -195,4 +227,56 @@ function highlightEdge(v1, v2) {
             }
         }
     }
+}
+
+function getAllPaths(v1, v2, visited, pathList, startingVertex, allPaths) {
+    if (v1 === v2) {
+        for (let i = 0; i < pathList.length; i++) {
+            allPaths[allPaths.length] = pathList[i];
+        }
+        allPaths[allPaths.length] = ' ';
+        return;
+    }
+
+    visited[v1.number - 1] = true;
+    let nbrs = getNeighbours(v1);
+
+    for (let i = 0; i < nbrs.length; i++) {
+        if (!visited[nbrs[i].number - 1]) {
+            pathList.push(nbrs[i].number);
+            getAllPaths(nbrs[i], v2, visited, pathList, startingVertex, allPaths);
+            pathList.splice(pathList.indexOf(nbrs[i].number), 1);
+        }
+    }
+
+    visited[v1.number - 1] = false;
+}
+
+function parsePaths(pathList) {
+    let parsedPaths = [];
+    let currentPath = [];
+    let pathNumber = 0;
+    for (let i = 0; i < pathList.length; i++) {
+        if (pathList[i] == ' ' || i == pathList.length - 1) {
+            parsedPaths[pathNumber] = currentPath.slice();
+            pathNumber++;
+            currentPath = [];
+            continue;
+        } else {
+            currentPath[currentPath.length] = pathList[i];
+        }
+    }
+    return parsedPaths;
+}
+
+function getShortestPath(parsedPaths) {
+    let smallestPathIndex = 0;
+    for (let i = 0; i < parsedPaths.length; i++) {
+        if (parsedPaths[smallestPathIndex].length > parsedPaths[i].length) {
+            smallestPathIndex = i;
+            continue;
+        }
+    }
+
+    return parsedPaths[smallestPathIndex];
 }

@@ -70,6 +70,7 @@ function within(x, y) {
 }
 
 function getVerticesForPath() {
+    graph.deselectAll();
     let vertexStr = document.getElementById('pathFinder').value;
     let pathedVertices = vertexStr.split(' ');
 
@@ -89,9 +90,10 @@ function getVerticesForPath() {
         return;
     }
 
-    let vertexPath = graph.findPath(graph.vertices[pathedVertices[0]-1],
-                    graph.vertices[pathedVertices[1]-1], [], []);
-    let numberPath = graph.getPathNumbers(vertexPath);
+    let pathList = [];
+    let numberOfPaths = graph.getPath(graph.vertices[pathedVertices[0]-1],
+                    graph.vertices[pathedVertices[1]-1], pathList);
+    let vertexPath = graph.getVertexPath(pathList);
     graph.highlightEdges(vertexPath);
     
     draw();
@@ -99,8 +101,9 @@ function getVerticesForPath() {
     context.textBaseline = 'top';
     context.font = '30px arial';
     context.fillStyle = 'black'
-    context.fillText(`Exists ${pathedVertices[0]},${pathedVertices[1]} path?: ${numberPath}`,
+    context.fillText(`Exists ${pathedVertices[0]},${pathedVertices[1]} path?: ${pathList}`,
                         10, 70);
+    context.fillText(`Total paths: ${numberOfPaths}`, 10, 110);
 }
 
 function checkConnectivity() {
