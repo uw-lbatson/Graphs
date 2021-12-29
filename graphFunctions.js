@@ -125,7 +125,6 @@ export function getPath(v1, v2, allPaths) {
     getAllPaths(v1, v2, visited, pathList, v1, allPaths);
 
     let parsedPaths = parsePaths(allPaths);
-    console.log(parsedPaths);
     let shortestPath = getShortestPath(parsedPaths);
 
     for (let i = 0; i < shortestPath.length; i++) {
@@ -194,6 +193,54 @@ export function getVertexPath(numberPath) {
     return vertexPath;
 }
 
+export function getCycle(allCycles) {
+    let degreeTwoVertices = getVerticesOfDegreeTwo();
+    let visited = [];
+    let cycleList = [];
+    for (let i = 0; i < degreeTwoVertices.length; i++) {
+        visited[degreeTwoVertices[i].number - 1] = false;
+        cycleList.push(degreeTwoVertices[i].number);
+        getAllCycles(degreeTwoVertices[i], visited, cycleList, allCycles, degreeTwoVertices);
+        cycleList = [];
+    }
+
+    allCycles = parsePaths(allCycles);
+    for (let i = 0; i < allCycles.length; i++) {
+        allCycles[i].pop();
+    }
+
+    let seen = [];
+    let noCopies = allCycles.filter((item) => {
+        let key = item.sort().join();
+        if(!seen.includes(key)) {
+            seen.push(key);
+            return item;
+        }
+    });
+
+    for (let i = 0; i < noCopies.length; i++) {
+        noCopies[i][noCopies[i].length] = noCopies[i][0];
+    }
+
+    allCycles = noCopies.slice();
+    return allCycles;
+}
+
+export function getSmallestCycle(cycleList) {
+    if (cycleList.length == 0) {
+        return Infinity;
+    }
+
+    let smallestCycleIndex = 0;
+    for (let i = 0; i < cycleList.length; i++) {
+        if (cycleList[smallestCycleIndex].length > cycleList[i].length) {
+            smallestCycleIndex = i;
+        }
+    }
+
+    return cycleList[smallestCycleIndex].length - 1;
+}
+
 
 
 
@@ -230,7 +277,7 @@ function highlightEdge(v1, v2) {
 }
 
 function getAllPaths(v1, v2, visited, pathList, startingVertex, allPaths) {
-    if (v1 === v2) {
+    if (v1 == v2) {
         for (let i = 0; i < pathList.length; i++) {
             allPaths[allPaths.length] = pathList[i];
         }
@@ -279,4 +326,49 @@ function getShortestPath(parsedPaths) {
     }
 
     return parsedPaths[smallestPathIndex];
+}
+
+function getVerticesOfDegreeTwo() {
+    let degreeTwoVertices = [];
+    for (let i = 0; i < vertices.length; i++) {
+        if (getNbrNumbers(vertices[i].length >= 2)) {
+            degreeTwoVertices.push(vertices[i]);
+        }
+    }
+    return degreeTwoVertices;
+}
+
+function areNumberNeighbours(v1Number, v2Number) {
+    for (let i = 0; i < edges.length; i++) {
+        let edge = edges[i];
+        if ((edge.to.number == v1Number && edge.from.number == v2Number) ||
+            (edge.to.number == v2Number && edge.from.number == v1Number)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function getAllCycles(v1, visited, cycleList, allCycles, degreeTwos) {
+    if (areNumberNeighbours(v1.number, cycleList[0]) && cycleList.length >= 3) {
+        for (let i = 0; i < cycleList.length; i++) {
+            allCycles[allCycles.length] = cycleList[i];
+        }
+        allCycles[allCycles.length] = cycleList[0];
+        allCycles[allCycles.length] = ' ';
+        return;
+    }
+
+    visited[v1.number - 1] = true;
+    let nbrs = getNeighbours(v1);
+
+    for (let i = 0; i < nbrs.length; i++) {
+        if (!visited[nbrs[i].number - 1] && degreeTwos.includes(nbrs[i])) {
+            cycleList.push(nbrs[i].number);
+            getAllCycles(nbrs[i], visited, cycleList, allCycles, degreeTwos);
+            cycleList.splice(cycleList.indexOf(nbrs[i].number), 1);
+        }
+    }
+
+    visited[v1.number - 1] = false;
 }

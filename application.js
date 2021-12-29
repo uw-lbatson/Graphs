@@ -107,6 +107,7 @@ function getVerticesForPath() {
 }
 
 function checkConnectivity() {
+    graph.deselectAll();
     let result = graph.isConnected();
     context.textAlign = 'left';
     context.textBaseline = 'top';
@@ -114,6 +115,24 @@ function checkConnectivity() {
     context.fillStyle = 'black'
     context.fillText(`Is connected?: ${result}`,
                         10, 70);
+}
+
+function returnCycles() {
+    graph.deselectAll();
+    let allCycles = graph.getCycle([]);
+    for (let i = 0; i < allCycles.length; i++) {
+        let numberCycle = allCycles[i];
+        let vertexCycle = graph.getVertexPath(numberCycle);
+        graph.highlightEdges(vertexCycle);
+    }
+
+    draw();
+    context.textAlign = 'left';
+    context.textBaseline = 'top';
+    context.font = '30px arial';
+    context.fillStyle = 'black'
+    context.fillText(`Total cycles: ${allCycles.length}`, 10, 70);
+    context.fillText(`Girth: ${graph.getSmallestCycle(allCycles)}`, 10, 110);
 }
 
 
@@ -197,6 +216,10 @@ document.getElementById("pathBtn").onclick = function() {
 
 document.getElementById("connectedBtn").onclick = function() {
     checkConnectivity();
+};
+
+document.getElementById("cyclesBtn").onclick = function() {
+    returnCycles();
 };
 
 
