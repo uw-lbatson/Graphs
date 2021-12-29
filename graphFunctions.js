@@ -108,7 +108,7 @@ export function pathExists(v1, v2, visited, queue) {
 
     for (let i = 0; i < vertexNbrs.length; i++) {
         if (!visited[vertexNbrs[i].number - 1]) {
-            if (findPath(vertexNbrs[i], v2, visited, queue)) {
+            if (pathExists(vertexNbrs[i], v2, visited, queue)) {
                 return queue;
             }
         }
@@ -146,9 +146,9 @@ export function getPathNumbers(path) {
     return false;
 }
 
-export function highlightEdges(path) {
-    for (let i = 0; i < path.length - 1; i++) {
-        highlightEdge(path[i], path[i + 1]);
+export function highlightEdges(edgeList) {
+    for (let i = 0; i < edgeList.length - 1; i++) {
+        highlightEdge(edgeList[i], edgeList[i + 1]);
     }
 }
 
@@ -241,6 +241,40 @@ export function getSmallestCycle(cycleList) {
     return cycleList[smallestCycleIndex].length - 1;
 }
 
+export function existsEulerianCircuit() {
+    if (vertices.length == 0) {
+        return "Graph has no vertices";
+    }
+
+    if (!isConnected()) {
+        for (let i = 0; i < vertices.length; i++) {
+            let vertex = vertices[i];
+            let nbrs = getNeighbours(vertex);
+            if (nbrs.length == 0) {
+                continue;
+            } else {
+                if (nbrs.length % 2 == 1) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    } else {
+        for (let i = 0; i < vertices.length; i++) {
+            let vertex = vertices[i];
+            let nbrs = getNeighbours(vertex);
+            if (nbrs.length % 2 == 1) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+export function getBridges() {
+    let bridges = [];
+    // if edge is not an edge in a cycle, add to bridges
+}
 
 
 

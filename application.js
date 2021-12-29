@@ -57,6 +57,13 @@ function draw() {
     }
 }
 
+function standardFont() {
+    context.textAlign = 'left';
+    context.textBaseline = 'top';
+    context.font = '30px arial';
+    context.fillStyle = 'black';
+}
+
 /**
  * finds first vertex around (x, y)
  */
@@ -97,10 +104,7 @@ function getVerticesForPath() {
     graph.highlightEdges(vertexPath);
     
     draw();
-    context.textAlign = 'left';
-    context.textBaseline = 'top';
-    context.font = '30px arial';
-    context.fillStyle = 'black'
+    standardFont();
     context.fillText(`Exists ${pathedVertices[0]},${pathedVertices[1]} path?: ${pathList}`,
                         10, 70);
     context.fillText(`Total paths: ${numberOfPaths}`, 10, 110);
@@ -108,13 +112,9 @@ function getVerticesForPath() {
 
 function checkConnectivity() {
     graph.deselectAll();
+    standardFont();
     let result = graph.isConnected();
-    context.textAlign = 'left';
-    context.textBaseline = 'top';
-    context.font = '30px arial';
-    context.fillStyle = 'black'
-    context.fillText(`Is connected?: ${result}`,
-                        10, 70);
+    context.fillText(`Is connected?: ${result}`, 10, 70);
 }
 
 function returnCycles() {
@@ -127,13 +127,21 @@ function returnCycles() {
     }
 
     draw();
-    context.textAlign = 'left';
-    context.textBaseline = 'top';
-    context.font = '30px arial';
-    context.fillStyle = 'black'
+    standardFont();
     context.fillText(`Total cycles: ${allCycles.length}`, 10, 70);
     context.fillText(`Girth: ${graph.getSmallestCycle(allCycles)}`, 10, 110);
 }
+
+function checkEulerianCircuit() {
+    graph.deselectAll();
+    standardFont();
+    context.fillText(`Has Eulerian Circuit?: ${graph.existsEulerianCircuit()}`, 10, 70);
+}
+
+function showBridges() {
+    
+}
+
 
 
 
@@ -220,6 +228,14 @@ document.getElementById("connectedBtn").onclick = function() {
 
 document.getElementById("cyclesBtn").onclick = function() {
     returnCycles();
+};
+
+document.getElementById("eulerCircuitBtn").onclick = function() {
+    checkEulerianCircuit();
+};
+
+document.getElementById("bridgesBtn").onclick = function() {
+    showBridges();
 };
 
 
