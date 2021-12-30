@@ -299,6 +299,27 @@ export function highlightBridges(bridgeList) {
     }
 }
 
+export function isTree() {
+    let cycles = getCycles([]);
+    let isForest = false;
+
+    for (let i = 0; i < vertices.length; i++) {
+        let vertex = vertices[i];
+        let nbrs = getNeighbours(vertex);
+        if (nbrs.length == 0) {
+            isForest = true;
+        }
+    }
+
+    if (cycles.length == 0 && isForest) {
+        return "Graph is a forest";
+    } else if (cycles.length == 0 && !isForest) {
+        return true;
+    }
+
+    return false;
+}
+
 
 
 

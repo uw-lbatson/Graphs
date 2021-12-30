@@ -112,6 +112,7 @@ function getVerticesForPath() {
 
 function checkConnectivity() {
     graph.deselectAll();
+    draw();
     standardFont();
     let result = graph.isConnected();
     context.fillText(`Is connected?: ${result}`, 10, 70);
@@ -134,11 +135,13 @@ function returnCycles() {
 
 function checkEulerianCircuit() {
     graph.deselectAll();
+    draw();
     standardFont();
     context.fillText(`Has Eulerian Circuit?: ${graph.existsEulerianCircuit()}`, 10, 70);
 }
 
 function showBridges() {
+    graph.deselectAll();
     let bridges = graph.getBridges();
     graph.highlightBridges(bridges);
     draw();
@@ -146,6 +149,13 @@ function showBridges() {
     context.fillText(`Total bridges: ${bridges.length}`, 10, 70);
 }
 
+function checkTree() {
+    graph.deselectAll();
+    let result = graph.isTree();
+    draw();
+    standardFont();
+    context.fillText(`Is a tree?: ${result}`, 10, 70);
+}
 
 
 
@@ -240,6 +250,10 @@ document.getElementById("eulerCircuitBtn").onclick = function() {
 
 document.getElementById("bridgesBtn").onclick = function() {
     showBridges();
+};
+
+document.getElementById("treeBtn").onclick = function() {
+    checkTree();
 };
 
 
