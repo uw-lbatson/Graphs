@@ -193,7 +193,7 @@ export function getVertexPath(numberPath) {
     return vertexPath;
 }
 
-export function getCycle(allCycles) {
+export function getCycles(allCycles) {
     let degreeTwoVertices = getVerticesOfDegreeTwo();
     let visited = [];
     let cycleList = [];
@@ -272,10 +272,32 @@ export function existsEulerianCircuit() {
 }
 
 export function getBridges() {
+    let cycles = getCycles([]);
+    let cycleEdges = [];
     let bridges = [];
-    // if edge is not an edge in a cycle, add to bridges
+
+    for (let i = 0; i < cycles.length; i++) {
+        cycles[i] = getEdgesFromPath(getVertexPath(cycles[i]));
+    }
+
+    cycleEdges = cycles.flat();
+
+    for (let i = 0; i < edges.length; i++) {
+        let edge = edges[i];
+        if (!cycleEdges.includes(edge)) {
+            bridges.push(edge);
+        }
+    }
+
+    return bridges;
 }
 
+export function highlightBridges(bridgeList) {
+    for (let i = 0; i < bridgeList.length; i++) {
+        let edge = bridgeList[i];
+        edge.highlight = true;
+    }
+}
 
 
 
@@ -405,4 +427,20 @@ function getAllCycles(v1, visited, cycleList, allCycles, degreeTwos) {
     }
 
     visited[v1.number - 1] = false;
+}
+
+function getEdgesFromPath(vertexPath) {
+    let edgeList = [];
+    for (let i = 0; i < vertexPath.length - 1; i++) {
+        let v1 = vertexPath[i];
+        let v2 = vertexPath[i + 1];
+        for (let j = 0; j < edges.length; j++) {
+            let edge = edges[j];
+            if ((edge.from == v1 && edge.to == v2) ||
+                (edge.from == v2 && edge.to == v1)) {
+                edgeList.push(edge);
+            }
+        }
+    }
+    return edgeList;
 }

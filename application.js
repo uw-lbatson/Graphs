@@ -119,7 +119,7 @@ function checkConnectivity() {
 
 function returnCycles() {
     graph.deselectAll();
-    let allCycles = graph.getCycle([]);
+    let allCycles = graph.getCycles([]);
     for (let i = 0; i < allCycles.length; i++) {
         let numberCycle = allCycles[i];
         let vertexCycle = graph.getVertexPath(numberCycle);
@@ -139,7 +139,11 @@ function checkEulerianCircuit() {
 }
 
 function showBridges() {
-    
+    let bridges = graph.getBridges();
+    graph.highlightBridges(bridges);
+    draw();
+    standardFont();
+    context.fillText(`Total bridges: ${bridges.length}`, 10, 70);
 }
 
 
