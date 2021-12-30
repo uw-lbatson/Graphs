@@ -11,8 +11,6 @@ let selection = undefined;
 function draw() {
     context.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
-    //graph.deselectAll();
-
     // draw every edge
     for (let i = 0; i < graph.edges.length; i++) {
         let edge = graph.edges[i];
@@ -32,7 +30,7 @@ function draw() {
 
         context.beginPath();
         context.lineWidth = 1;
-        context.fillStyle = v.selected ? v.selectedFill : v.fillStyle;
+        context.fillStyle = v.selected ? v.selectedFill : v.leaf ? v.leafFill : v.fillStyle;
         context.arc(v.x, v.y, v.radius, 0, Math.PI * 2, true);
         context.strokeStyle = v.strokeStyle;
         context.fill();
@@ -55,6 +53,10 @@ function draw() {
             context.fillText(`Neighbours: ${nbrs}`, 10, 40);
         }
     }
+
+    let density = 2 * graph.edges.length / graph.vertices.length;
+    standardFont();
+    context.fillText(`Graph density: ${density.toFixed(2)}`, 10, window.innerHeight - 80);
 }
 
 function standardFont() {
@@ -152,9 +154,18 @@ function showBridges() {
 function checkTree() {
     graph.deselectAll();
     let result = graph.isTree();
+    let leafVertices = [];
+    let totalLeaves = graph.countLeaves(leafVertices);
+
+    for (let i = 0; i < leafVertices.length; i++) {
+        let vertex = leafVertices[i];
+        vertex.leaf = true;
+    }
+
     draw();
     standardFont();
     context.fillText(`Is a tree?: ${result}`, 10, 70);
+    context.fillText(`Total leaves: ${totalLeaves}`, 10, 110);
 }
 
 

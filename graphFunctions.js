@@ -35,7 +35,9 @@ export function addVertex(vx, vy) {
         fillStyle: '#8c92ff',
         strokeStyle: '#000000',
         selectedFill: '#ff2b59',
-        selected: false
+        leafFill: '#32b354',
+        selected: false,
+        leaf: false
     };
     vertices.push(vertex);
 }
@@ -156,6 +158,7 @@ export function deselectAll() {
     for (let i = 0; i < vertices.length; i++) {
         let vertex = vertices[i];
         vertex.selected = false;
+        vertex.leaf = false;
     }
 
     for (let i = 0; i < edges.length; i++) {
@@ -299,6 +302,7 @@ export function highlightBridges(bridgeList) {
     }
 }
 
+// consider reducing time by checking if connected with n vertices, n-1 edges
 export function isTree() {
     let cycles = getCycles([]);
     let isForest = false;
@@ -312,7 +316,7 @@ export function isTree() {
     }
 
     if (cycles.length == 0 && isForest) {
-        return "Graph is a forest";
+        return "Forest";
     } else if (cycles.length == 0 && !isForest) {
         return true;
     }
@@ -320,6 +324,23 @@ export function isTree() {
     return false;
 }
 
+export function countLeaves(leafVertices) {
+    let total = 0;
+
+    if (isTree() && isTree() != "Forest") {
+        for (let i = 0; i < vertices.length; i++) {
+            let vertex = vertices[i];
+            let nbrs = getNeighbours(vertex);
+            if (nbrs.length == 1) {
+                total++;
+                leafVertices[leafVertices.length] = vertex;
+            }
+        }
+        return total;
+    }
+
+    return "Graph is not a tree";
+}
 
 
 
