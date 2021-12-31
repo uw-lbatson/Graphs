@@ -36,8 +36,12 @@ export function addVertex(vx, vy) {
         strokeStyle: '#000000',
         selectedFill: '#ff2b59',
         leafFill: '#32b354',
+        setAFill: '#fcba03',
+        setBFill: '#c63fe8',
         selected: false,
-        leaf: false
+        leaf: false,
+        setA: false,
+        setB: false
     };
     vertices.push(vertex);
 }
@@ -159,6 +163,8 @@ export function deselectAll() {
         let vertex = vertices[i];
         vertex.selected = false;
         vertex.leaf = false;
+        vertex.setA = false;
+        vertex.setB = false;
     }
 
     for (let i = 0; i < edges.length; i++) {
@@ -341,6 +347,54 @@ export function countLeaves(leafVertices) {
 
     return "Graph is not a tree";
 }
+
+export function isBipartite(setB) {
+    let cycles = getCycles([]);
+    console.log(cycles);
+
+    for (let i = 0; i < cycles.length; i++) {
+        cycles[i] = getEdgesFromPath(getVertexPath(cycles[i]));
+    }
+
+    for (let i = 0; i < cycles.length; i++) {
+        let cycle = cycles[i];
+        if (cycle.length % 2 == 1) {
+            return false;
+        }
+    }
+
+    if (vertices.length != 0 && edges.length != 0) {
+        vertices[0].setA = true;
+        getBipartition(vertices[0]);
+    } else {
+        for (let i = 0; i < vertices.length; i++) {
+            if (i % 2 == 0) {
+                vertices[i].setA = true;
+            } else {
+                vertices[i].setB = true;
+            }
+        }
+    }
+
+    return true;
+}
+
+function getBipartition(vertex) {
+    let nbrs = getNeighbours(vertex);
+    for (let i = 0; i < nbrs.length; i++) {
+        let neighbour = nbrs[i];
+        if (!neighbour.setA && !neighbour.setB) {
+            if (vertex.setA) {
+                neighbour.setB = true;
+            } else {
+                neighbour.setA = true;
+            }
+            getBipartition(neighbour);
+        }
+    }
+}
+
+
 
 
 

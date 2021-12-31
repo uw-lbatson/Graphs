@@ -30,7 +30,19 @@ function draw() {
 
         context.beginPath();
         context.lineWidth = 1;
-        context.fillStyle = v.selected ? v.selectedFill : v.leaf ? v.leafFill : v.fillStyle;
+
+        if (v.selected) {
+            context.fillStyle = v.selectedFill;
+        } else if (v.leaf) {
+            context.fillStyle = v.leafFill;
+        } else if (v.setA) {
+            context.fillStyle = v.setAFill;
+        } else if (v.setB) {
+            context.fillStyle = v.setBFill;
+        } else {
+            context.fillStyle = v.fillStyle;
+        }
+
         context.arc(v.x, v.y, v.radius, 0, Math.PI * 2, true);
         context.strokeStyle = v.strokeStyle;
         context.fill();
@@ -168,6 +180,14 @@ function checkTree() {
     context.fillText(`Total leaves: ${totalLeaves}`, 10, 110);
 }
 
+function checkBipartite() {
+    graph.deselectAll();
+    let result = graph.isBipartite();
+    draw();
+    standardFont();
+    context.fillText(`Is bipartite?: ${result}`, 10, 70);
+}
+
 
 
 /* Key and mouse functions */
@@ -265,6 +285,10 @@ document.getElementById("bridgesBtn").onclick = function() {
 
 document.getElementById("treeBtn").onclick = function() {
     checkTree();
+};
+
+document.getElementById("bipartiteBtn").onclick = function() {
+    checkBipartite();
 };
 
 
