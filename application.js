@@ -22,6 +22,14 @@ function draw() {
         context.moveTo(fromVertex.x, fromVertex.y);
         context.lineTo(toVertex.x, toVertex.y);
         context.stroke();
+
+        if (edge.weight != 0) {
+            let textX = (toVertex.x + fromVertex.x) / 2;
+            let textY = (toVertex.y + fromVertex.y) / 2;
+            context.font = '20px arial';
+            context.fillStyle = 'red';
+            context.fillText(edge.weight, textX, textY);
+        }
     }
 
     // draw every vertex
@@ -212,7 +220,11 @@ function down(e) {
         if (target) {
             if (selection && selection !== target) {
                 if (!graph.isEdge(selection, target)) {
-                    graph.addEdge(selection, target);
+                    let weight = -1;
+                    while (weight < 0) {
+                        weight = +prompt("Enter weight:", 0);
+                    }
+                    graph.addEdge(selection, target, weight);
                 }
             }
             selection = target;

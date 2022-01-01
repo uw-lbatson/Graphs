@@ -21,8 +21,8 @@ export function vertexOnEdge(vertex, edge) {
     return false;
 }
 
-export function addEdge(v1, v2) {
-    let edge = { from: v1, to: v2, highlight: false }
+export function addEdge(v1, v2, value) {
+    let edge = { from: v1, to: v2, highlight: false, weight: value }
     edges.push(edge);
 }
 
@@ -350,15 +350,10 @@ export function countLeaves(leafVertices) {
 
 export function isBipartite(setB) {
     let cycles = getCycles([]);
-    console.log(cycles);
-
-    for (let i = 0; i < cycles.length; i++) {
-        cycles[i] = getEdgesFromPath(getVertexPath(cycles[i]));
-    }
 
     for (let i = 0; i < cycles.length; i++) {
         let cycle = cycles[i];
-        if (cycle.length % 2 == 1) {
+        if (cycle.length % 2 == 0) {
             return false;
         }
     }
