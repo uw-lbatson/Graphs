@@ -1,7 +1,6 @@
 import * as graph from './graphFunctions.js';
 
 const canvas = document.getElementById('appCanvas');
-canvas.style.display = 'block';
 const context = canvas.getContext('2d');
 const VKEY = 86;
 const EKEY = 69;
@@ -123,7 +122,7 @@ function getVerticesForPath() {
     let numberOfPaths = graph.getPath(graph.vertices[pathedVertices[0]-1],
                     graph.vertices[pathedVertices[1]-1], pathList);
     let vertexPath = graph.getVertexPath(pathList);
-    graph.highlightEdges(vertexPath);
+    graph.highlightPath(vertexPath);
     
     draw();
     standardFont();
@@ -146,7 +145,7 @@ function returnCycles() {
     for (let i = 0; i < allCycles.length; i++) {
         let numberCycle = allCycles[i];
         let vertexCycle = graph.getVertexPath(numberCycle);
-        graph.highlightEdges(vertexCycle);
+        graph.highlightPath(vertexCycle);
     }
 
     draw();
@@ -165,7 +164,7 @@ function checkEulerianCircuit() {
 function showBridges() {
     graph.deselectAll();
     let bridges = graph.getBridges();
-    graph.highlightBridges(bridges);
+    graph.highlightEdges(bridges);
     draw();
     standardFont();
     context.fillText(`Total bridges: ${bridges.length}`, 10, 70);
@@ -200,10 +199,19 @@ function checkBipartite() {
 
 /* Key and mouse functions */
 
+function getMousePos(canvasObj, e) {
+    var rect = canvasObj.getBoundingClientRect();
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    };
+}
+
 function move(e) {
     if (selection && e.buttons) {
-        selection.x = e.x;
-        selection.y = e.y;
+        let pos = getMousePos(canvas, e);
+        selection.x = pos.x;
+        selection.y = pos.y;
         draw();
     }
 }
@@ -211,7 +219,8 @@ function move(e) {
 function down(e) {
     if(e.target.id === 'appCanvas') {
         graph.deselectAll();
-        let target = within(e.x, e.y);
+        let pos = getMousePos(canvas, e);
+        let target = within(pos.x, pos.y);
 
         if (selection && selection.selected) {
             selection.selected = false;
@@ -236,8 +245,9 @@ function down(e) {
 
 function up(e) {
     if(e.target.id === 'appCanvas') {
+        let pos = getMousePos(canvas, e);
         if (!selection) {
-            graph.addVertex(e.x, e.y);
+            graph.addVertex(pos.x, pos.y);
             draw();
         }
 
@@ -307,8 +317,8 @@ document.getElementById("bipartiteBtn").onclick = function() {
 
 
 function resize() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth * 0.6;
+    canvas.height = window.innerHeight * 0.8;
 }
 
 window.onresize = resize;

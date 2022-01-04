@@ -152,9 +152,9 @@ export function getPathNumbers(path) {
     return false;
 }
 
-export function highlightEdges(edgeList) {
-    for (let i = 0; i < edgeList.length - 1; i++) {
-        highlightEdge(edgeList[i], edgeList[i + 1]);
+export function highlightPath(pathList) {
+    for (let i = 0; i < pathList.length - 1; i++) {
+        highlightEdge(pathList[i], pathList[i + 1]);
     }
 }
 
@@ -218,20 +218,17 @@ export function getCycles(allCycles) {
         allCycles[i].pop();
     }
 
-    let seen = [];
+    let set = new Set();
     let noCopies = allCycles.filter((item) => {
-        let key = item.sort().join();
-        if(!seen.includes(key)) {
-            seen.push(key);
-            return item;
-        }
+        let key = [...item].sort((a, b) => a - b).join();
+        return !set.has(key) ? (set.add(key), true) : false;
     });
 
-    for (let i = 0; i < noCopies.length; i++) {
-        noCopies[i][noCopies[i].length] = noCopies[i][0];
+    allCycles = Array.from(noCopies);
+    for (let i = 0; i < allCycles.length; i++) {
+        allCycles[i][allCycles[i].length] = allCycles[i][0];
     }
 
-    allCycles = noCopies.slice();
     return allCycles;
 }
 
@@ -301,15 +298,19 @@ export function getBridges() {
     return bridges;
 }
 
-export function highlightBridges(bridgeList) {
-    for (let i = 0; i < bridgeList.length; i++) {
-        let edge = bridgeList[i];
+export function highlightEdges(edgeList) {
+    for (let i = 0; i < edgeList.length; i++) {
+        let edge = edgeList[i];
         edge.highlight = true;
     }
 }
 
 // consider reducing time by checking if connected with n vertices, n-1 edges
 export function isTree() {
+    if (vertices.length == 0) {
+        return "No vertices";
+    }
+
     let cycles = getCycles([]);
     let isForest = false;
 
@@ -349,6 +350,10 @@ export function countLeaves(leafVertices) {
 }
 
 export function isBipartite(setB) {
+    if (vertices.length == 0) {
+        return "No vertices";
+    }
+
     let cycles = getCycles([]);
 
     for (let i = 0; i < cycles.length; i++) {
@@ -373,22 +378,6 @@ export function isBipartite(setB) {
 
     return true;
 }
-
-function getBipartition(vertex) {
-    let nbrs = getNeighbours(vertex);
-    for (let i = 0; i < nbrs.length; i++) {
-        let neighbour = nbrs[i];
-        if (!neighbour.setA && !neighbour.setB) {
-            if (vertex.setA) {
-                neighbour.setB = true;
-            } else {
-                neighbour.setA = true;
-            }
-            getBipartition(neighbour);
-        }
-    }
-}
-
 
 
 
@@ -534,4 +523,20 @@ function getEdgesFromPath(vertexPath) {
         }
     }
     return edgeList;
+}
+
+
+function getBipartition(vertex) {
+    let nbrs = getNeighbours(vertex);
+    for (let i = 0; i < nbrs.length; i++) {
+        let neighbour = nbrs[i];
+        if (!neighbour.setA && !neighbour.setB) {
+            if (vertex.setA) {
+                neighbour.setB = true;
+            } else {
+                neighbour.setA = true;
+            }
+            getBipartition(neighbour);
+        }
+    }
 }
