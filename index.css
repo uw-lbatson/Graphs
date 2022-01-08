@@ -94,9 +94,9 @@ button.tutorial {
     background-color: rgb(155, 155, 155);
     text-align: center;
     transition: all 0.2s;
-    font-size: 40px;
+    font-size: 30px;
     position: fixed;
-    bottom: 0;
+    top: 0;
     left: 0;
 }
 
